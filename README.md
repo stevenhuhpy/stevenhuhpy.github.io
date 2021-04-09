@@ -1,1 +1,1 @@
-Please goto repo "hexo" for src.
+Please goto repo "stevenhuhpy/hexo"(now is private) for src.
