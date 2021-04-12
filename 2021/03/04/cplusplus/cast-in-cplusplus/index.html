@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="msvalidate.01" content="97517ECEE3C9A099F83F1F51F8FED883">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css">
+  <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script>
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stevenhuhpy.com","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="要点回顾 此部分方便知识点快速回顾，首次阅读请从引言部分开始。   常用的强制转换为 dynamic_cast 和 static_cast。 除非必须，不要使用 const_cast 和 reinterpret_cast，因为它们存在一些老式 C 语言转换中的隐患。 dynamic_cast 主要用于多态类型的强制转换，而 static_cast 主要用于非多态类型的强制转换。 static_ca">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于 C++ 中的强制转换 - 基础篇">
+<meta property="og:url" content="https://stevenhuhpy.com/2021/03/04/cplusplus/cast-in-cplusplus/index.html">
+<meta property="og:site_name" content="Steven HU&#39;s Blog">
+<meta property="og:description" content="要点回顾 此部分方便知识点快速回顾，首次阅读请从引言部分开始。   常用的强制转换为 dynamic_cast 和 static_cast。 除非必须，不要使用 const_cast 和 reinterpret_cast，因为它们存在一些老式 C 语言转换中的隐患。 dynamic_cast 主要用于多态类型的强制转换，而 static_cast 主要用于非多态类型的强制转换。 static_ca">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-03-04T05:41:42.000Z">
+<meta property="article:modified_time" content="2021-04-12T05:40:21.649Z">
+<meta property="article:author" content="Steven HU">
+<meta property="article:tag" content="Basic C++">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://stevenhuhpy.com/2021/03/04/cplusplus/cast-in-cplusplus/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<title>关于 C++ 中的强制转换 - 基础篇 | Steven HU's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Steven HU's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">因上努力，果上随缘。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">18</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">3</span></a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">5</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A6%81%E7%82%B9%E5%9B%9E%E9%A1%BE"><span class="nav-number">1.</span> <span class="nav-text">要点回顾</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%BA%E5%88%B6%E8%BD%AC%E6%8D%A2%E6%9C%89%E5%93%AA%E4%BA%9B%E7%B1%BB%E5%9E%8B%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">强制转换有哪些类型？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81dynamic-cast-%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="nav-number">3.1.</span> <span class="nav-text">1、dynamic_cast 运算符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81static-cast-%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="nav-number">3.2.</span> <span class="nav-text">2、static_cast 运算符</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%BA%E5%88%86%E5%87%A0%E7%A7%8D%E5%BC%BA%E5%88%B6%E8%BD%AC%E6%8D%A2%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">4.</span> <span class="nav-text">区分几种强制转换的使用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Steven HU"
+      src="/images/avatar.JPG">
+  <p class="site-author-name" itemprop="name">Steven HU</p>
+  <div class="site-description" itemprop="description">万千码农中取 Boss 赏识，从事软件研发工作，并持续热爱着，擅长 Modern C++，C#/.NET，欢迎来和我交流, WeChat: laoxia021753</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://stevenhuhpy.com/2021/03/04/cplusplus/cast-in-cplusplus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.JPG">
+      <meta itemprop="name" content="Steven HU">
+      <meta itemprop="description" content="万千码农中取 Boss 赏识，从事软件研发工作，并持续热爱着，擅长 Modern C++，C#/.NET，欢迎来和我交流, WeChat: laoxia021753">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Steven HU's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          关于 C++ 中的强制转换 - 基础篇
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-03-04 13:41:42" itemprop="dateCreated datePublished" datetime="2021-03-04T13:41:42+08:00">2021-03-04</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2021-04-12 13:40:21" itemprop="dateModified" datetime="2021-04-12T13:40:21+08:00">2021-04-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/c/" itemprop="url" rel="index"><span itemprop="name">c++</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Valine: </span>
+  
+    <a title="valine" href="/2021/03/04/cplusplus/cast-in-cplusplus/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/03/04/cplusplus/cast-in-cplusplus/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="Symbols count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Symbols count in article: </span>
+      <span>4.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>4 mins.</span>
+    </span>
+</div>
+
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="要点回顾"><a href="#要点回顾" class="headerlink" title="要点回顾"></a>要点回顾</h2><blockquote>
+<p>此部分方便知识点快速回顾，首次阅读请从引言部分开始。</p>
+</blockquote>
+<ul>
+<li>常用的强制转换为 <code>dynamic_cast</code> 和 <code>static_cast</code>。</li>
+<li>除非必须，不要使用 <code>const_cast</code> 和 <code>reinterpret_cast</code>，因为它们存在一些老式 C 语言转换中的隐患。</li>
+<li><code>dynamic_cast</code> 主要用于多态类型的强制转换，而 <code>static_cast</code> 主要用于非多态类型的强制转换。</li>
+<li><code>static_cast</code> 转换不像 <code>dynamic_cast</code> 那样安全。因为 <code>static_cast</code> 没有运行时检测。通过 <code>dynamic_cast</code> 进行转换时，一旦存在歧义，就会导致失败，然而 <code>static_cast</code> 会像没有错误发生一样返回结果。尽管 <code>dynamic_cast</code> 更加安全，但 <code>dynamic_cast</code> 仅适用于指针和引用，并且运行时检测是需要消耗性能的。</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>假设有基类 <code>A</code>，包含了虚函数 <code>func1</code>，以及有派生类 <code>B</code>，继承于类 <code>A</code>，派生类 <code>B</code> 中实现了函数 <code>func1</code>。此时可以用 <code>A</code> 类型的指针指向 <code>B</code> 类型的对象，并用 <code>A</code> 类型的指针调用 <code>B</code> 类型对象中的函数 <code>func1</code>。这时，就形成了<strong>多态</strong>。包含虚函数的类 <code>A</code>，我们也称为<strong>多态类</strong>。</p>
+<p>由于派生类 <code>B</code> 完整包含了 基类 <code>A</code> 的所有定义，将 <code>B</code> 类型的指针转换为 <code>A</code> 类型的指针<strong>总是安全的</strong>。</p>
+<p>而将 <code>A</code> 类型的指针强制转换为 <code>B</code> 类型的指针时，如果 <code>A</code> 类型指针指向的对象确实为 <code>B</code> 类型的对象，那么转换<strong>也是安全的</strong>。此时，该 <code>B</code> 类型对象被称为<strong>完整对象</strong>(complete object)。</p>
+<h2 id="强制转换有哪些类型？"><a href="#强制转换有哪些类型？" class="headerlink" title="强制转换有哪些类型？"></a>强制转换有哪些类型？</h2><p>C++ 包含了以下几种强制转换运算符，这些运算符用于消除老式 C 语言转换中的存在的歧义和隐患：</p>
+<blockquote>
+<ul>
+<li><code>dynamic_cast</code></li>
+<li><code>static_cast</code></li>
+<li><code>const_cast</code></li>
+<li><code>reinterpret_cast</code></li>
+<li><code>safe_cast</code></li>
+</ul>
+</blockquote>
+<p>本文会着重介绍如何使用 <code>dynamic_cast</code> 和 <code>static_cast</code>。</p>
+<p>提醒：</p>
+<blockquote>
+<p>除非必须，不要使用 <code>const_cast</code> 和 <code>reinterpret_cast</code>，因为它们存在一些老式 C 语言转换中的隐患。</p>
+</blockquote>
+<hr>
+<h3 id="1、dynamic-cast-运算符"><a href="#1、dynamic-cast-运算符" class="headerlink" title="1、dynamic_cast 运算符"></a>1、<strong>dynamic_cast</strong> 运算符</h3><p>语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dynamic_cast &lt;type-id&gt; (expression)</span><br></pre></td></tr></table></figure>
+
+<p><code>type-id</code> 必须是一个指针或者引用，指向/引用已定义的类类型或者 void。如果<code>type-id</code> 是指针，则 <code>expression</code> 必须也为指针类型，如果 <code>type-id</code> 是引用，<code>expression</code> 必须为左值类型。</p>
+<p>如果 <code>type-id</code> 是 void*，那么在运行时将检测 <code>expression</code> 的实际类型。其结果返回 <code>expression</code> 指向的完整对象。</p>
+<p>如非需要，现代 C++ 中应该避免使用 <code>void</code> 指针，因为容易出错。</p>
+<p>下面看些示例，了解 <code>dynamic_cast</code> 的使用方式。</p>
+<p>示例1：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Root</span> &#123;</span> &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Base</span> :</span> <span class="keyword">public</span> Root &#123; &#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Derived</span> :</span> <span class="keyword">public</span> Base &#123; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(Derived* pd)</span> </span>&#123;</span><br><span class="line">   Base* pb = <span class="keyword">dynamic_cast</span>&lt;Base*&gt;(pd);   <span class="comment">// ok: Base is a direct base class</span></span><br><span class="line">                                   <span class="comment">// pb points to Base subobject of pd</span></span><br><span class="line">   Root* pr = <span class="keyword">dynamic_cast</span>&lt;Root*&gt;(pd);   <span class="comment">// ok: Root is an indirect base class</span></span><br><span class="line">                                   <span class="comment">// pr points to Root subobject of pd</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>示例1 中提到了<strong>子对象</strong>(subobject)的概念，注意与<strong>子类型</strong>进行区分：</p>
+<blockquote>
+<ul>
+<li><code>Root</code> 类型包含子类型 <code>Base</code>，<code>Base</code> 类型包含子类型 <code>Derived</code>。  </li>
+<li><code>Derived</code> 对象包含了 <code>Base</code> 类型的子对象，<code>Base</code> 类型的子对象又包含了 <code>Root</code> 类型的子对象。</li>
+</ul>
+</blockquote>
+<p>再联系下前面说的：派生类完整包含了基类的所有定义。</p>
+<p>示例2：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span> &#123;</span><span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span>;&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">D</span> :</span> <span class="keyword">public</span> B &#123;<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span>;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   B* pb = <span class="keyword">new</span> D;   <span class="comment">// unclear but ok</span></span><br><span class="line">   B* pb2 = <span class="keyword">new</span> B;</span><br><span class="line"></span><br><span class="line">   D* pd = <span class="keyword">dynamic_cast</span>&lt;D*&gt;(pb);   <span class="comment">// ok: pb actually points to a D</span></span><br><span class="line">   D* pd2 = <span class="keyword">dynamic_cast</span>&lt;D*&gt;(pb2);   <span class="comment">// pb2 was nullptr.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>示例2 中 通过 <code>dynamic_cast</code> 转换为 <code>pd2</code> 时，不会报错，返回 <code>nullptr</code>。但如果同样地情况转换的对象是引用类型，那么运行时会抛出 <code>std::bad_cast</code> 异常。如果 <code>pb2</code> 指向/引用的对象无效，同样也会抛出异常。</p>
+<p>示例3：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">A</span> &#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">printf_s</span>(<span class="string">&quot;in A\n&quot;</span>);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">B</span> :</span> A &#123;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">printf_s</span>(<span class="string">&quot;in B\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">printf_s</span>(<span class="string">&quot;test2 in B\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">C</span> :</span> B &#123;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">printf_s</span>(<span class="string">&quot;in C\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="built_in">printf_s</span>(<span class="string">&quot;test2 in C\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Globaltest</span><span class="params">(A&amp; a)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        C &amp;c = <span class="keyword">dynamic_cast</span>&lt;C&amp;&gt;(a);</span><br><span class="line">        <span class="built_in">printf_s</span>(<span class="string">&quot;in GlobalTest\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in"><span class="keyword">catch</span></span>(std::bad_cast) &#123;</span><br><span class="line">        <span class="built_in">printf_s</span>(<span class="string">&quot;Can&#x27;t cast to C\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    A *pa = <span class="keyword">new</span> C;</span><br><span class="line">    A *pa2 = <span class="keyword">new</span> B;</span><br><span class="line"></span><br><span class="line">    pa-&gt;<span class="built_in">test</span>();</span><br><span class="line"></span><br><span class="line">    B * pb = <span class="keyword">dynamic_cast</span>&lt;B *&gt;(pa);</span><br><span class="line">    <span class="keyword">if</span> (pb)</span><br><span class="line">        pb-&gt;<span class="built_in">test2</span>();</span><br><span class="line"></span><br><span class="line">    C * pc = <span class="keyword">dynamic_cast</span>&lt;C *&gt;(pa2);</span><br><span class="line">    <span class="keyword">if</span> (pc)</span><br><span class="line">        pc-&gt;<span class="built_in">test2</span>();</span><br><span class="line"></span><br><span class="line">    C ConStack;</span><br><span class="line">    <span class="built_in">Globaltest</span>(ConStack);</span><br><span class="line"></span><br><span class="line">   <span class="comment">// will fail because B knows nothing about C</span></span><br><span class="line">    B BonStack;</span><br><span class="line">    <span class="built_in">Globaltest</span>(BonStack);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Output:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">in C</span><br><span class="line">test2 in B</span><br><span class="line">in GlobalTest</span><br><span class="line">Can&#39;t cast to C</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="2、static-cast-运算符"><a href="#2、static-cast-运算符" class="headerlink" title="2、static_cast 运算符"></a>2、<strong>static_cast</strong> 运算符</h3><p>语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">static_cast &lt;type-id&gt; (expression)</span><br></pre></td></tr></table></figure>
+
+<p><code>static_cast</code> 通常用于数值类型转换，例如枚举和整型，整型和浮点类型的转换。</p>
+<p>在标准 C++ 中，<code>static_cast</code> 转换没有运行时检测来保证安全性。在 C++/CX 中，则包含了编译和运行时检测。</p>
+<p><code>static_cast</code> 运算符能够用于将基类指针转换为派生类指针，但这样的转换不总是安全的。</p>
+<p>下面还是通过示例进行讲解。</p>
+<p>示例1：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span> &#123;</span>&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">D</span> :</span> <span class="keyword">public</span> B &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(B* pb, D* pd)</span> </span>&#123;</span><br><span class="line">   D* pd2 = <span class="keyword">static_cast</span>&lt;D*&gt;(pb);   <span class="comment">// Not safe, D can have fields</span></span><br><span class="line">                                   <span class="comment">// and methods that are not in B.</span></span><br><span class="line"></span><br><span class="line">   B* pb2 = <span class="keyword">static_cast</span>&lt;B*&gt;(pd);   <span class="comment">// Safe conversion, D always</span></span><br><span class="line">                                   <span class="comment">// contains all of B.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例1 中 <code>pd2</code> 不为空，当用指针 <code>pd2</code> 调用 <code>B</code> 类型对象不存在的方法或者成员时可能会发生运行时错误（比如调用虚函数）或者返回非预期的值。</p>
+<p>示例2：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">unsigned</span> <span class="keyword">char</span> BYTE;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   <span class="keyword">char</span> ch;</span><br><span class="line">   <span class="keyword">int</span> i = <span class="number">65</span>;</span><br><span class="line">   <span class="keyword">float</span> f = <span class="number">2.5</span>;</span><br><span class="line">   <span class="keyword">double</span> dbl;</span><br><span class="line"></span><br><span class="line">   ch = <span class="keyword">static_cast</span>&lt;<span class="keyword">char</span>&gt;(i);   <span class="comment">// int to char</span></span><br><span class="line">   dbl = <span class="keyword">static_cast</span>&lt;<span class="keyword">double</span>&gt;(f);   <span class="comment">// float to double</span></span><br><span class="line">   i = <span class="keyword">static_cast</span>&lt;BYTE&gt;(ch);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例2 中 <code>static_cast</code> 运算符显示地将内置类型进行转换。</p>
+<p>关于 <code>static_cast</code> 运算符，还有以下几种使用情况：</p>
+<blockquote>
+<ul>
+<li><code>static_cast</code> 能够显式的将整型转换为枚举类型。如果整型值不在枚举值范围内，那么返回的枚举值是未定义的。 </li>
+<li><code>static_cast</code> 能将任何 <code>expression</code> 显式地转换为 <code>void</code> 类型。</li>
+<li><code>static_cast</code> 操作符不会去除 <code>const</code>，<code>volatile</code>，<code>__unaligned</code> 属性。</li>
+</ul>
+</blockquote>
+<h2 id="区分几种强制转换的使用场景"><a href="#区分几种强制转换的使用场景" class="headerlink" title="区分几种强制转换的使用场景"></a>区分几种强制转换的使用场景</h2><p><code>dynamic_cast</code> 主要用于多态类型的强制转换，而 <code>static_cast</code> 主要用于非多态类型的强制转换。</p>
+<p><code>static_cast</code> 转换不像 <code>dynamic_cast</code> 那样安全。因为 <code>static_cast</code> 没有运行时检测。通过 <code>dynamic_cast</code> 进行转换时，一旦存在歧义，就会导致失败，然而 <code>static_cast</code> 会像没有错误发生一样返回结果。尽管 <code>dynamic_cast</code> 更加安全，但 <code>dynamic_cast</code> 仅适用于指针和引用，并且运行时检测是需要消耗性能的。</p>
+<p>示例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">   <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Test</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">D</span> :</span> <span class="keyword">public</span> B &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(B* pb)</span> </span>&#123;</span><br><span class="line">   D* pd1 = <span class="keyword">dynamic_cast</span>&lt;D*&gt;(pb);</span><br><span class="line">   D* pd2 = <span class="keyword">static_cast</span>&lt;D*&gt;(pb);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>pb</code> 实际指向类型 <code>D</code> 或者 <code>pd == 0</code>，那么 <code>pd1</code> 和 <code>pd2</code> 将获得相同的值。</p>
+<p>如果 <code>pb</code> 实际指向类型 <code>B</code>，那么 <code>dynamic_cast</code> 会返回 <code>0</code>。但是 <code>static_cast</code> 依赖于 <code>expression</code> 认定 <code>pb</code> 指向 <code>D</code> 类型对象，于是简单的返回 <code>D</code> 类型的指针。</p>
+<p>结果就是，<code>static_cast</code> 转换会继续执行，但其返回结果是未定义的。这就需要调用者去进一步验证转换结果是有效的。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/cpp/cpp/casting?view=msvc-160">https://docs.microsoft.com/en-us/cpp/cpp/casting?view=msvc-160</a></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">Related Posts</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\04\12\cplusplus\exception-handling\" rel="bookmark">Modern C++ 中错误处理的最佳实践</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\17\cplusplus\compile-error-c4819\" rel="bookmark">关于编译告警 C4819 的完整解决方案</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\12\cplusplus\push-back-vs-emplace-back\" rel="bookmark">你想知道的 std::vector::push_back 和 std::vector::emplace_back</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\11\cplusplus\how-to-use-dump-file\" rel="bookmark">如何使用 Dump 文件？</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\10\cplusplus\what-you-should-known-4-pdb-file\" rel="bookmark">关于 PDB 文件你需要知道什么？</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Basic-C/" rel="tag"><i class="fa fa-tag"></i> Basic C++</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/02/18/cplusplus/smart-pointer/" rel="prev" title="C++ 中的智能指针-基础">
+                  <i class="fa fa-chevron-left"></i> C++ 中的智能指针-基础
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/03/05/cplusplus/virtual-function/" rel="next" title="C++ 中的虚函数表及虚函数执行原理">
+                  C++ 中的虚函数表及虚函数执行原理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Steven HU</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Symbols count total">67k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">1:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+<script
+  async
+  src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+    </div>
+  </footer>
+
+  
+  <script size="10" alpha="0.6" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+  <script>
+    NProgress.configure({
+      showSpinner: true
+    });
+    NProgress.start();
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') {
+        NProgress.inc(0.8);
+      }
+      if (document.readyState === 'complete') {
+        NProgress.done();
+      }
+    });
+    document.addEventListener('pjax:send', () => {
+      NProgress.start();
+    });
+    document.addEventListener('pjax:success', () => {
+      NProgress.done();
+    });
+  </script>
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+<script>
+NexT.utils.loadComments('#valine-comments', () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    new Valine(Object.assign({"enable":true,"appId":"jB6A35tvF0LjzWwNsVUfuQXo-MdYXbMMI","appKey":"K2TAb2RfLKzVREj9hrx1qzFo","serverURLs":null,"placeholder":"欢迎留言指正与交流...","avatar":"robohash","meta":["nick","mail","link"],"pageSize":10,"lang":null,"visitor":false,"comment_count":true,"recordIP":false,"enableQQ":false,"requiredFields":[]}, {
+      el: '#valine-comments',
+      path: "/2021/03/04/cplusplus/cast-in-cplusplus/",
+      serverURLs: "https://jb6a35tv.api.lncldglobal.com"
+    }));
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

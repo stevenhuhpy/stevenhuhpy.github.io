@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="msvalidate.01" content="97517ECEE3C9A099F83F1F51F8FED883">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css">
+  <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script>
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stevenhuhpy.com","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="引言大多数人知道 PDB 文件是用来帮助我们 debug 的，但也仅此而已。 本文主要介绍当你遇到 PDB 文件时（windows 开发中），你必须要知道的内容。 重要的事情说三遍PDB 文件和源代码一样重要！！!  PDB 文件和源代码一样重要！！!  PDB 文件和源代码一样重要！！!">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于 PDB 文件你需要知道什么？">
+<meta property="og:url" content="https://stevenhuhpy.com/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/index.html">
+<meta property="og:site_name" content="Steven HU&#39;s Blog">
+<meta property="og:description" content="引言大多数人知道 PDB 文件是用来帮助我们 debug 的，但也仅此而已。 本文主要介绍当你遇到 PDB 文件时（windows 开发中），你必须要知道的内容。 重要的事情说三遍PDB 文件和源代码一样重要！！!  PDB 文件和源代码一样重要！！!  PDB 文件和源代码一样重要！！!">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-03-10T07:43:34.000Z">
+<meta property="article:modified_time" content="2021-04-12T05:40:21.662Z">
+<meta property="article:author" content="Steven HU">
+<meta property="article:tag" content="Basic C++">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://stevenhuhpy.com/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<title>关于 PDB 文件你需要知道什么？ | Steven HU's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Steven HU's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">因上努力，果上随缘。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">18</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">3</span></a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">5</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E8%A6%81%E7%9A%84%E4%BA%8B%E6%83%85%E8%AF%B4%E4%B8%89%E9%81%8D"><span class="nav-number">2.</span> <span class="nav-text">重要的事情说三遍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D"><span class="nav-number">3.</span> <span class="nav-text">开始之前</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-PDB-%E6%96%87%E4%BB%B6%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">什么是 PDB 文件？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDB-%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A0%E8%BD%BD"><span class="nav-number">5.</span> <span class="nav-text">PDB 文件的加载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDB-%E6%96%87%E4%BB%B6%E7%9A%84%E5%86%85%E5%AE%B9"><span class="nav-number">6.</span> <span class="nav-text">PDB 文件的内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Steven HU"
+      src="/images/avatar.JPG">
+  <p class="site-author-name" itemprop="name">Steven HU</p>
+  <div class="site-description" itemprop="description">万千码农中取 Boss 赏识，从事软件研发工作，并持续热爱着，擅长 Modern C++，C#/.NET，欢迎来和我交流, WeChat: laoxia021753</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://stevenhuhpy.com/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.JPG">
+      <meta itemprop="name" content="Steven HU">
+      <meta itemprop="description" content="万千码农中取 Boss 赏识，从事软件研发工作，并持续热爱着，擅长 Modern C++，C#/.NET，欢迎来和我交流, WeChat: laoxia021753">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Steven HU's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          关于 PDB 文件你需要知道什么？
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-03-10 15:43:34" itemprop="dateCreated datePublished" datetime="2021-03-10T15:43:34+08:00">2021-03-10</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2021-04-12 13:40:21" itemprop="dateModified" datetime="2021-04-12T13:40:21+08:00">2021-04-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/c/" itemprop="url" rel="index"><span itemprop="name">c++</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Valine: </span>
+  
+    <a title="valine" href="/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="Symbols count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Symbols count in article: </span>
+      <span>3.3k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>3 mins.</span>
+    </span>
+</div>
+
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>大多数人知道 PDB 文件是用来帮助我们 debug 的，但也仅此而已。</p>
+<p>本文主要介绍当你遇到 PDB 文件时（windows 开发中），你必须要知道的内容。</p>
+<h2 id="重要的事情说三遍"><a href="#重要的事情说三遍" class="headerlink" title="重要的事情说三遍"></a>重要的事情说三遍</h2><p><strong>PDB 文件和源代码一样重要！！!</strong> </p>
+<p><strong>PDB 文件和源代码一样重要！！!</strong> </p>
+<p><strong>PDB 文件和源代码一样重要！！!</strong> </p>
+<span id="more"></span>
+
+
+<h2 id="开始之前"><a href="#开始之前" class="headerlink" title="开始之前"></a>开始之前</h2><p>首先定义两个概念：</p>
+<ul>
+<li><strong>本地编译</strong>：在你本机开发环境中的编译。</li>
+<li><strong>官方编译</strong>：在编译服务器上的编译。</li>
+</ul>
+<p>这两种编译的区分很重要，因为调试本地编译往往很简单，但是问题往往出现在官方编译中。</p>
+<p>官方编译至少需要有一个地方（Symbol Server）来存放编译出来的二进制及 PDB 文件。这样当某个版本发现任何问题，我们可以获取到对应的 PDB 文件进行调试。<br>没有匹配的 PDB 文件，调试器几乎不可能完成调试任务，或者你将付出高昂的代价才能解决问题。</p>
+<blockquote>
+<p>更多关于 Symbol Server 的内容，参考 <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/june/bugslayer-symbols-and-crash-dumps">https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/june/bugslayer-symbols-and-crash-dumps</a></p>
+</blockquote>
+<p>Visual Studio 和 WinDBG 知道如何访问 Symbol Server 并且如果二进制文件来自官方编译，那么调试器能够自动加载匹配的 PDF 文件。</p>
+<p>在将 PDB 文件放在 Symbol Server 上之前，还需要做一件事：在官方编译出来的 PDB 文件上，通过 Source Server 工具，进行源文件索引（source indexing）。索引过程会嵌入版本控制命令用于拉取当前版本编译的源文件。这样，当你调试当前版本时，你就不用担心找不到版本的源文件。</p>
+<blockquote>
+<p>更多关于 Source Server 的内容，参考 <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/archive/msdn-magazine/2006/august/source-server-helps-you-kill-bugs-dead-in-visual-studio-2005">https://docs.microsoft.com/en-us/archive/msdn-magazine/2006/august/source-server-helps-you-kill-bugs-dead-in-visual-studio-2005</a></p>
+</blockquote>
+<h2 id="什么是-PDB-文件？"><a href="#什么是-PDB-文件？" class="headerlink" title="什么是 PDB 文件？"></a>什么是 PDB 文件？</h2><p>现在，我们可以开始介绍什么是 PDB 文件，以及调试器是如何查找 PDB 文件了。<br>实际的 PDB 文件格式是加密的，但是微软提供了 API，为调试器提供 PDB 文件的数据。</p>
+<p>非托管的 C++ PDB 文件包含了以下信息：</p>
+<ul>
+<li>公有函数，私有函数和静态函数的地址</li>
+<li>全局变量的名称和地址</li>
+<li>参数和局部变量的名称以及栈上的偏移量</li>
+<li>类，结构体以及数据定义的类型信息</li>
+<li>FPO（Frame Pointer Omission） 数据</li>
+<li>源文件的文件名及行信息。</li>
+</ul>
+<p>而 .NET 的 PDB 文件只包含了两项内容：</p>
+<ul>
+<li>源文件的文件名及行信息</li>
+<li>局部变量的名称</li>
+</ul>
+<p>其他所有信息已经存放在 .NET 元数据中，所以没有必要再 PDB 文件中冗余。</p>
+<h2 id="PDB-文件的加载"><a href="#PDB-文件的加载" class="headerlink" title="PDB 文件的加载"></a>PDB 文件的加载</h2><p>当模块被加载到进程的地址空间后，调试器会使用两种信息找到匹配的 PDB 文件。首先，当然是文件名。如果你加载 ZZZ.DLL，那么调试器就会查找 ZZZ.PDB。<br>更重要的是，调试器如何知道这就是匹配的 PDB 文件？这是通过比对内嵌于 PDB 文件和二进制文件中的 GUID 来确认的。</p>
+<p>负责将 GUID 嵌入二进制和 PDB 文件的是编译器（.NET）或者链接器（C++）。想想，历史编译的版本如果没有保存 PDB 文件，你还能调试吗？答案是否定的，哪怕你没有修改源文件！你可能会想是否可以修改 PDB 文件的 GUID？很遗憾，答案也是否定的。</p>
+<p>你可以查看二进制文件中的 GUID。使用 Visual Studio -&gt; DUMPBIN 的命令行工具，你可以列出所有的 PE（Portable Executable） 文件内容。可以在 Visual Studio 的命令行工具中调用 DUMPBIN。</p>
+<blockquote>
+<p>更多关于 DUMPBIN 的内容参考：<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/february/inside-windows-win32-portable-executable-file-format-in-detail">https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/february/inside-windows-win32-portable-executable-file-format-in-detail</a> 和 <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/march/inside-windows-an-in-depth-look-into-the-win32-portable-executable-file-format-part-2">https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/march/inside-windows-an-in-depth-look-into-the-win32-portable-executable-file-format-part-2</a></p>
+</blockquote>
+<p>DUMPBIN 有很多命令行指令，其中显示 GUID 的指令是 /HEADERS。在输出内容中，对我们来说重要的是 Debug Directories 部分的内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Debug Directories</span><br><span class="line"></span><br><span class="line">        Time Type        Size      RVA  Pointer</span><br><span class="line">    -------- ------- -------- -------- --------</span><br><span class="line">    6045C20E cv            60 00541AC8   5408C8    Format: RSDS, &#123;DC80D058-127B-4379-B859-3F9F6978A4DB&#125;, 1, C:ZZZ.pdb</span><br></pre></td></tr></table></figure>
+
+<p>知道了调试器如何确定匹配的 PDB 文件，下一步我们讨论调试器从哪里查找 PDB 文件。首先，调试器会在加载二进制文件的目录查找对应的 PDB 文件，如果没有找到，那么就查找PE 文件中 Debug Directories 内容里硬编码的 PDB 文件路径，在上面的输出示例中是 “C:ZZZ.pdb”（.NET 应用编译工具 MSBUILD会将 PDB 文件编译到 OBJ&lt;Debug/Relase/…&gt; 目录下，如果编译成功，再拷贝到 DEBUG 或者 RELEASE 目录）。如果在上述两个位置都没有找到，但是建立了 Symbol Server，那么调试器会在 Symbol Server 的缓存目录里继续查找。这种查找顺序也保证了本地编译和官方编译不会有冲突。</p>
+<p>在 Visual Studio 中调试的时候，你可以在窗口 Modules 中的列 Symbol File 里看到 PDB 文件的位置。 </p>
+<p>对大多数应用来讲这种加载方式都没有问题。但是对于需要将程序集放入 GAC（Global Assembly Cache）的 .NET 应用，PDB 的加载就会变得有趣了。对于本地编译，调试器会在编译目录找到 PDB 文件，所以没什么问题。问题来源于当你想要在其他机器上调试本地编译版本。</p>
+<p>在其他机器上调式，很多人会用 Gacutil.exe 将程序集放入 GAC，然后打开命令行在 “C:WINDOWSASSEMBLY” 下查找程序集的物理位置。但是基于 Any CPU 编译的程序集实际上会放入类似 “C:WindowsassemblyGAC_MSILExample1.0.0.0__682bc775ff82796a” 的路径。</p>
+<p>上述路径中，Example 是程序集名称，1.0.0.0 是版本号，682bc775ff82796a 是公有秘钥令牌值（public key token value）。当你推断出这个路径后，你可以将 PDB 文件拷入这个目录然后调试器会加载它。</p>
+<h2 id="PDB-文件的内容"><a href="#PDB-文件的内容" class="headerlink" title="PDB 文件的内容"></a>PDB 文件的内容</h2><p>对于官方编译，因为有源文件索引工具，所以 PDB 文件中会存储版本控制命令，用于将源文件放入你配置的源文件缓存池。对于本地编译，PDB 文件中存储的是二进制文件对应的源文件的完整路径。换句话说，如果你使用 C:FOO 中的源文件 MYCODE.CPP，那么 PDB 文件中存储的就是 C:FOOMYCODE.CPP。</p>
+<p>理论上，所有的官方编译会自动立马进行源文件索引，并将内容存储于 Symbol Server，以至于你都不用考虑源文件在哪。然而，有些开发团队在测试及其他环节中会考量编译结果是否满足使用的要求，在此之前，不会对 PDB 文件进行源文件索引。如果你确实需要调试未索引的版本，最好将源代码下载到本地时保证和编译服务器相同的磁盘和目录，否则，你可能会在调试时遇到麻烦。尽管 Visual Studio 调试器和 WinDBG 有配置源文件搜索路径的选项，但要配置正确并不容易。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a target="_blank" rel="noopener" href="https://www.wintellect.com/pdb-files-what-every-developer-must-know/">https://www.wintellect.com/pdb-files-what-every-developer-must-know/</a></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">Related Posts</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\04\12\cplusplus\exception-handling\" rel="bookmark">Modern C++ 中错误处理的最佳实践</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\17\cplusplus\compile-error-c4819\" rel="bookmark">关于编译告警 C4819 的完整解决方案</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\12\cplusplus\push-back-vs-emplace-back\" rel="bookmark">你想知道的 std::vector::push_back 和 std::vector::emplace_back</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\11\cplusplus\how-to-use-dump-file\" rel="bookmark">如何使用 Dump 文件？</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\09\cplusplus\hash-map\" rel="bookmark">图解哈希表及其原理</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Basic-C/" rel="tag"><i class="fa fa-tag"></i> Basic C++</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/03/09/cplusplus/hash-map/" rel="prev" title="图解哈希表及其原理">
+                  <i class="fa fa-chevron-left"></i> 图解哈希表及其原理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/03/11/cplusplus/how-to-use-dump-file/" rel="next" title="如何使用 Dump 文件？">
+                  如何使用 Dump 文件？ <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Steven HU</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Symbols count total">67k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">1:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+<script
+  async
+  src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+    </div>
+  </footer>
+
+  
+  <script size="10" alpha="0.6" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+  <script>
+    NProgress.configure({
+      showSpinner: true
+    });
+    NProgress.start();
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') {
+        NProgress.inc(0.8);
+      }
+      if (document.readyState === 'complete') {
+        NProgress.done();
+      }
+    });
+    document.addEventListener('pjax:send', () => {
+      NProgress.start();
+    });
+    document.addEventListener('pjax:success', () => {
+      NProgress.done();
+    });
+  </script>
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+<script>
+NexT.utils.loadComments('#valine-comments', () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    new Valine(Object.assign({"enable":true,"appId":"jB6A35tvF0LjzWwNsVUfuQXo-MdYXbMMI","appKey":"K2TAb2RfLKzVREj9hrx1qzFo","serverURLs":null,"placeholder":"欢迎留言指正与交流...","avatar":"robohash","meta":["nick","mail","link"],"pageSize":10,"lang":null,"visitor":false,"comment_count":true,"recordIP":false,"enableQQ":false,"requiredFields":[]}, {
+      el: '#valine-comments',
+      path: "/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/",
+      serverURLs: "https://jb6a35tv.api.lncldglobal.com"
+    }));
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

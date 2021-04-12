@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="msvalidate.01" content="97517ECEE3C9A099F83F1F51F8FED883">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css">
+  <script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script>
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stevenhuhpy.com","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+<meta name="description" content="要点回顾 此部分方便知识点快速回顾，首次阅读请从引言部分开始。   哈希表（Hash Table）其实也叫散列表，是一个数据结构。 哈希表本质上就是一个数组，只不过数组存放的是单一的数据，而哈希表中存放的是键值对（key - value pair）。 key 通过哈希函数（hash function）得到数组的索引，进而存取索引位置的值。 不同的 key 通过哈希函数可能得到相同的索引值，此时，产">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图解哈希表及其原理">
+<meta property="og:url" content="https://stevenhuhpy.com/2021/03/09/cplusplus/hash-map/index.html">
+<meta property="og:site_name" content="Steven HU&#39;s Blog">
+<meta property="og:description" content="要点回顾 此部分方便知识点快速回顾，首次阅读请从引言部分开始。   哈希表（Hash Table）其实也叫散列表，是一个数据结构。 哈希表本质上就是一个数组，只不过数组存放的是单一的数据，而哈希表中存放的是键值对（key - value pair）。 key 通过哈希函数（hash function）得到数组的索引，进而存取索引位置的值。 不同的 key 通过哈希函数可能得到相同的索引值，此时，产">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://stevenhuhpy.com/2021/03/09/cplusplus/hash-map/hash_map.bmp">
+<meta property="article:published_time" content="2021-03-09T07:42:05.000Z">
+<meta property="article:modified_time" content="2021-04-12T05:40:21.650Z">
+<meta property="article:author" content="Steven HU">
+<meta property="article:tag" content="Basic C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://stevenhuhpy.com/2021/03/09/cplusplus/hash-map/hash_map.bmp">
+
+
+<link rel="canonical" href="https://stevenhuhpy.com/2021/03/09/cplusplus/hash-map/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<title>图解哈希表及其原理 | Steven HU's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Steven HU's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">因上努力，果上随缘。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives<span class="badge">18</span></a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories<span class="badge">3</span></a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags<span class="badge">5</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A6%81%E7%82%B9%E5%9B%9E%E9%A1%BE"><span class="nav-number">1.</span> <span class="nav-text">要点回顾</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%93%88%E5%B8%8C%E8%A1%A8%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">什么是哈希表？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E8%A1%A8%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">哈希表实现原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">引用</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Steven HU"
+      src="/images/avatar.JPG">
+  <p class="site-author-name" itemprop="name">Steven HU</p>
+  <div class="site-description" itemprop="description">万千码农中取 Boss 赏识，从事软件研发工作，并持续热爱着，擅长 Modern C++，C#/.NET，欢迎来和我交流, WeChat: laoxia021753</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://stevenhuhpy.com/2021/03/09/cplusplus/hash-map/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.JPG">
+      <meta itemprop="name" content="Steven HU">
+      <meta itemprop="description" content="万千码农中取 Boss 赏识，从事软件研发工作，并持续热爱着，擅长 Modern C++，C#/.NET，欢迎来和我交流, WeChat: laoxia021753">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Steven HU's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图解哈希表及其原理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-03-09 15:42:05" itemprop="dateCreated datePublished" datetime="2021-03-09T15:42:05+08:00">2021-03-09</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">Edited on</span>
+        <time title="Modified: 2021-04-12 13:40:21" itemprop="dateModified" datetime="2021-04-12T13:40:21+08:00">2021-04-12</time>
+      </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/c/" itemprop="url" rel="index"><span itemprop="name">c++</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">Views: </span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Valine: </span>
+  
+    <a title="valine" href="/2021/03/09/cplusplus/hash-map/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/03/09/cplusplus/hash-map/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="Symbols count in article">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">Symbols count in article: </span>
+      <span>1.5k</span>
+    </span>
+    <span class="post-meta-item" title="Reading time">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">Reading time &asymp;</span>
+      <span>1 mins.</span>
+    </span>
+</div>
+
+
+          
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="要点回顾"><a href="#要点回顾" class="headerlink" title="要点回顾"></a>要点回顾</h2><blockquote>
+<p>此部分方便知识点快速回顾，首次阅读请从引言部分开始。</p>
+</blockquote>
+<ul>
+<li>哈希表（Hash Table）其实也叫散列表，是一个数据结构。</li>
+<li>哈希表本质上就是一个数组，只不过数组存放的是单一的数据，而哈希表中存放的是键值对（key - value pair）。</li>
+<li>key 通过哈希函数（hash function）得到数组的索引，进而存取索引位置的值。</li>
+<li>不同的 key 通过哈希函数可能得到相同的索引值，此时，产生了哈希碰撞。</li>
+<li>通过在数组中插入链表或者二叉树，可以解决哈希碰撞问题。</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>哈希这个词想必大家经常听到，这也说明了它使用的频繁程度，HashMap 和 HashTable 都与哈希这个词有关系。那哈希是什么，要搞清楚它，我们得先来说下哈希表。</p>
+<h2 id="什么是哈希表？"><a href="#什么是哈希表？" class="headerlink" title="什么是哈希表？"></a>什么是哈希表？</h2><p><strong>哈希表（Hash Table）</strong> 是一种用于存储 <strong>键值对</strong> 的基本数据结构。在 C++ 中，哈希表使用 <strong>哈希函数</strong> 来计算数组的索引，进而存取数组中对应索引位置的值。</p>
+<p>百科定义：</p>
+<blockquote>
+<p>散列表（Hash table，也叫哈希表），是根据键（Key）而直接访问在内存存储位置的数据结构。也就是说，它通过计算一个关于键值的函数，将所需查询的数据映射到表中一个位置来访问记录，这加快了查找速度。这个映射函数称做散列函数，存放记录的数组称做散列表。</p>
+</blockquote>
+<p>计算索引的过程被称为 <strong>哈希（hash）</strong>。</p>
+<h2 id="哈希表实现原理"><a href="#哈希表实现原理" class="headerlink" title="哈希表实现原理"></a>哈希表实现原理</h2><p>用一个简单的例子来说明哈希表的原理：</p>
+<p><strong>假设</strong>：有一本中文词典，里面包含了所有的汉字，但是这些汉字是按任意顺序随意排版的，那么想要在其中找到某一个汉字，你就需要从头至尾一个一个核查，如果运气差，这个汉字正好在词典的末尾，那你需要遍历整本词典才能找到你要查的汉字。</p>
+<p><strong>优化</strong>：因为汉字和拼音之间存在着一种确定的关系，为了提高查找速度，现在将所有汉字按照拼音（key）进行排序（拼音可以根据首字母，第二个字母依次进一步排序），并且每个拼音都有一个对应页码（index），从该页开始，存放拼音对应的汉字（value）。所以找到拼音，也就能在对应的页码找到对应的汉字。其中，拼音和页码之间，有着某种固定的映射关系，可以通过某种方式计算出来（hash function）。</p>
+<p>由此可见，哈希表可以根据一个 key 值来直接访问数据，因此查找速度快。</p>
+<p><strong>但是</strong>，上面的例子，还存在一个问题，放在同一页码（具有相同拼音）的汉字可能不止一个（同音字），这时候通过拼音（key）获取到的汉字（value）应该是哪个呢？这就出现了<strong>碰撞（hash collision）</strong>。</p>
+<p>为了解决碰撞，实现哈希表可以有以下两种方式：</p>
+<ul>
+<li>数组 + 链表</li>
+<li>数组 + 二叉树</li>
+</ul>
+<p>所以，<strong>哈希表本质上就是一个数组</strong>。只不过数组存放的是单一的数据，而哈希表中存放的是键值对。</p>
+<p>链表或二叉树是用来解决碰撞的。</p>
+<p>下面用图例说明哈希表以及解决哈希碰撞的链表实现：</p>
+<p><img src="hash_map.bmp"></p>
+<p>因为哈希表中 key 必须是唯一的，所以图示给拼音加了后缀 _1 和 _2。key <em>han_1</em> 和 <em>han_2</em> 通过哈希函数 <em>F(x)</em> 计算出来的页码都是 <em>244</em>。这时就产生了哈希碰撞。为了解决碰撞问题，新建了一个链表，链表的每个结点都包含了一个键值对，当输入 key <em>han_2</em> 时，哈希表在 <em>244</em> 位置找到了键值对 *[han_1 - 汉]*，但是通过比对发现找到的键值对的 key 是 <em>han_1</em>，不等于 <em>han_2</em>，所以继续遍历到链表的下一个结点，下一个结点存放了键值对 <em>[han_2 - 汗]<em>，通过比较发现 key 确实是 <em>han_2</em>，因此返回了汉字（value）</em>汗</em>。</p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a target="_blank" rel="noopener" href="https://www.educba.com/c-plus-plus-hash-table/">https://www.educba.com/c-plus-plus-hash-table/</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/AkPIN6Ugno9vkQ2AAmCEAA">https://mp.weixin.qq.com/s/AkPIN6Ugno9vkQ2AAmCEAA</a></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">Related Posts</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\04\12\cplusplus\exception-handling\" rel="bookmark">Modern C++ 中错误处理的最佳实践</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\17\cplusplus\compile-error-c4819\" rel="bookmark">关于编译告警 C4819 的完整解决方案</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\12\cplusplus\push-back-vs-emplace-back\" rel="bookmark">你想知道的 std::vector::push_back 和 std::vector::emplace_back</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\11\cplusplus\how-to-use-dump-file\" rel="bookmark">如何使用 Dump 文件？</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\2021\03\10\cplusplus\what-you-should-known-4-pdb-file\" rel="bookmark">关于 PDB 文件你需要知道什么？</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Basic-C/" rel="tag"><i class="fa fa-tag"></i> Basic C++</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/03/05/cplusplus/virtual-function/" rel="prev" title="C++ 中的虚函数表及虚函数执行原理">
+                  <i class="fa fa-chevron-left"></i> C++ 中的虚函数表及虚函数执行原理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/" rel="next" title="关于 PDB 文件你需要知道什么？">
+                  关于 PDB 文件你需要知道什么？ <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Steven HU</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="Symbols count total">67k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">1:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+<script
+  async
+  src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+    </div>
+  </footer>
+
+  
+  <script size="10" alpha="0.6" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+  <script>
+    NProgress.configure({
+      showSpinner: true
+    });
+    NProgress.start();
+    document.addEventListener('readystatechange', () => {
+      if (document.readyState === 'interactive') {
+        NProgress.inc(0.8);
+      }
+      if (document.readyState === 'complete') {
+        NProgress.done();
+      }
+    });
+    document.addEventListener('pjax:send', () => {
+      NProgress.start();
+    });
+    document.addEventListener('pjax:success', () => {
+      NProgress.done();
+    });
+  </script>
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+<script>
+NexT.utils.loadComments('#valine-comments', () => {
+  NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
+    new Valine(Object.assign({"enable":true,"appId":"jB6A35tvF0LjzWwNsVUfuQXo-MdYXbMMI","appKey":"K2TAb2RfLKzVREj9hrx1qzFo","serverURLs":null,"placeholder":"欢迎留言指正与交流...","avatar":"robohash","meta":["nick","mail","link"],"pageSize":10,"lang":null,"visitor":false,"comment_count":true,"recordIP":false,"enableQQ":false,"requiredFields":[]}, {
+      el: '#valine-comments',
+      path: "/2021/03/09/cplusplus/hash-map/",
+      serverURLs: "https://jb6a35tv.api.lncldglobal.com"
+    }));
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
