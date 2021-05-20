@@ -27,21 +27,21 @@
     var NexT = window.NexT || {};
     var CONFIG = {"hostname":"stevenhuhpy.com","root":"/","images":"/images","scheme":"Gemini","version":"8.3.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":false,"nav":null,"activeClass":"valine"},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
-<meta name="description" content="引言大多数人知道 PDB 文件是用来帮助我们 debug 的，但也仅此而已。 本文主要介绍当你遇到 PDB 文件时（windows 开发中），你必须要知道的内容。 重要的事情说三遍PDB 文件和源代码一样重要！！!  PDB 文件和源代码一样重要！！!  PDB 文件和源代码一样重要！！!">
+<meta name="description" content="Original please visit: https:&#x2F;&#x2F;web.archive.org&#x2F;web&#x2F;20180107141940&#x2F;http:&#x2F;&#x2F;www.cs.umd.edu:80&#x2F;class&#x2F;sum2003&#x2F;cmsc311&#x2F;Notes&#x2F;Data&#x2F;endian.html  Basic Memory ConceptsIn order to understand the concept of big">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于 PDB 文件你需要知道什么？">
-<meta property="og:url" content="https://stevenhuhpy.com/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/index.html">
+<meta property="og:title" content="Big and Little Endian">
+<meta property="og:url" content="https://stevenhuhpy.com/2021/03/09/computer_theory/big_little_endian/index.html">
 <meta property="og:site_name" content="Steven HU&#39;s Blog">
-<meta property="og:description" content="引言大多数人知道 PDB 文件是用来帮助我们 debug 的，但也仅此而已。 本文主要介绍当你遇到 PDB 文件时（windows 开发中），你必须要知道的内容。 重要的事情说三遍PDB 文件和源代码一样重要！！!  PDB 文件和源代码一样重要！！!  PDB 文件和源代码一样重要！！!">
+<meta property="og:description" content="Original please visit: https:&#x2F;&#x2F;web.archive.org&#x2F;web&#x2F;20180107141940&#x2F;http:&#x2F;&#x2F;www.cs.umd.edu:80&#x2F;class&#x2F;sum2003&#x2F;cmsc311&#x2F;Notes&#x2F;Data&#x2F;endian.html  Basic Memory ConceptsIn order to understand the concept of big">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-03-10T07:43:34.000Z">
-<meta property="article:modified_time" content="2021-04-12T05:40:21.662Z">
+<meta property="article:published_time" content="2021-03-09T07:42:05.000Z">
+<meta property="article:modified_time" content="2021-04-19T02:34:30.089Z">
 <meta property="article:author" content="Steven HU">
-<meta property="article:tag" content="Basic C++">
+<meta property="article:tag" content="Computer Theroy">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://stevenhuhpy.com/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/">
+<link rel="canonical" href="https://stevenhuhpy.com/2021/03/09/computer_theory/big_little_endian/">
 
 
 <script class="page-configurations">
@@ -53,7 +53,7 @@
     lang   : 'en'
   };
 </script>
-<title>关于 PDB 文件你需要知道什么？ | Steven HU's Blog</title>
+<title>Big and Little Endian | Steven HU's Blog</title>
   
 
 
@@ -191,7 +191,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E8%A6%81%E7%9A%84%E4%BA%8B%E6%83%85%E8%AF%B4%E4%B8%89%E9%81%8D"><span class="nav-number">2.</span> <span class="nav-text">重要的事情说三遍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E4%B9%8B%E5%89%8D"><span class="nav-number">3.</span> <span class="nav-text">开始之前</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-PDB-%E6%96%87%E4%BB%B6%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">什么是 PDB 文件？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDB-%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A0%E8%BD%BD"><span class="nav-number">5.</span> <span class="nav-text">PDB 文件的加载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PDB-%E6%96%87%E4%BB%B6%E7%9A%84%E5%86%85%E5%AE%B9"><span class="nav-number">6.</span> <span class="nav-text">PDB 文件的内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">引用</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Basic-Memory-Concepts"><span class="nav-number">1.</span> <span class="nav-text">Basic Memory Concepts</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Storing-Words-in-Memory"><span class="nav-number">2.</span> <span class="nav-text">Storing Words in Memory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Big-Endian"><span class="nav-number">3.</span> <span class="nav-text">Big Endian</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Little-Endian"><span class="nav-number">4.</span> <span class="nav-text">Little Endian</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Which-Way-Makes-Sense"><span class="nav-number">5.</span> <span class="nav-text">Which Way Makes Sense?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#History-of-Endian-ness"><span class="nav-number">6.</span> <span class="nav-text">History of Endian-ness</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Misconceptions"><span class="nav-number">7.</span> <span class="nav-text">Misconceptions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-style-strings"><span class="nav-number">8.</span> <span class="nav-text">C-style strings</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -260,7 +260,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://stevenhuhpy.com/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/">
+    <link itemprop="mainEntityOfPage" href="https://stevenhuhpy.com/2021/03/09/computer_theory/big_little_endian/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.JPG">
@@ -273,7 +273,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          关于 PDB 文件你需要知道什么？
+          Big and Little Endian
         </h1>
 
         <div class="post-meta-container">
@@ -284,14 +284,14 @@
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2021-03-10 15:43:34" itemprop="dateCreated datePublished" datetime="2021-03-10T15:43:34+08:00">2021-03-10</time>
+      <time title="Created: 2021-03-09 15:42:05" itemprop="dateCreated datePublished" datetime="2021-03-09T15:42:05+08:00">2021-03-09</time>
     </span>
       <span class="post-meta-item">
         <span class="post-meta-item-icon">
           <i class="far fa-calendar-check"></i>
         </span>
         <span class="post-meta-item-text">Edited on</span>
-        <time title="Modified: 2021-04-12 13:40:21" itemprop="dateModified" datetime="2021-04-12T13:40:21+08:00">2021-04-12</time>
+        <time title="Modified: 2021-04-19 10:34:30" itemprop="dateModified" datetime="2021-04-19T10:34:30+08:00">2021-04-19</time>
       </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -299,7 +299,7 @@
       </span>
       <span class="post-meta-item-text">In</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/c/" itemprop="url" rel="index"><span itemprop="name">c++</span></a>
+          <a href="/categories/computer-theroy/" itemprop="url" rel="index"><span itemprop="name">computer_theroy</span></a>
         </span>
     </span>
 
@@ -319,8 +319,8 @@
     </span>
     <span class="post-meta-item-text">Valine: </span>
   
-    <a title="valine" href="/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/" itemprop="commentCount"></span>
+    <a title="valine" href="/2021/03/09/computer_theory/big_little_endian/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/03/09/computer_theory/big_little_endian/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -332,14 +332,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">Symbols count in article: </span>
-      <span>3.3k</span>
+      <span>7.3k</span>
     </span>
     <span class="post-meta-item" title="Reading time">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">Reading time &asymp;</span>
-      <span>3 mins.</span>
+      <span>7 mins.</span>
     </span>
 </div>
 
@@ -352,62 +352,83 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>大多数人知道 PDB 文件是用来帮助我们 debug 的，但也仅此而已。</p>
-<p>本文主要介绍当你遇到 PDB 文件时（windows 开发中），你必须要知道的内容。</p>
-<h2 id="重要的事情说三遍"><a href="#重要的事情说三遍" class="headerlink" title="重要的事情说三遍"></a>重要的事情说三遍</h2><p><strong>PDB 文件和源代码一样重要！！!</strong> </p>
-<p><strong>PDB 文件和源代码一样重要！！!</strong> </p>
-<p><strong>PDB 文件和源代码一样重要！！!</strong> </p>
-<span id="more"></span>
-
-
-<h2 id="开始之前"><a href="#开始之前" class="headerlink" title="开始之前"></a>开始之前</h2><p>首先定义两个概念：</p>
-<ul>
-<li><strong>本地编译</strong>：在你本机开发环境中的编译。</li>
-<li><strong>官方编译</strong>：在编译服务器上的编译。</li>
-</ul>
-<p>这两种编译的区分很重要，因为调试本地编译往往很简单，但是问题往往出现在官方编译中。</p>
-<p>官方编译至少需要有一个地方（Symbol Server）来存放编译出来的二进制及 PDB 文件。这样当某个版本发现任何问题，我们可以获取到对应的 PDB 文件进行调试。<br>没有匹配的 PDB 文件，调试器几乎不可能完成调试任务，或者你将付出高昂的代价才能解决问题。</p>
-<blockquote>
-<p>更多关于 Symbol Server 的内容，参考 <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/june/bugslayer-symbols-and-crash-dumps">https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/june/bugslayer-symbols-and-crash-dumps</a></p>
+        <blockquote>
+<p>Original please visit: <br/><br><a target="_blank" rel="noopener" href="https://web.archive.org/web/20180107141940/http://www.cs.umd.edu:80/class/sum2003/cmsc311/Notes/Data/endian.html">https://web.archive.org/web/20180107141940/http://www.cs.umd.edu:80/class/sum2003/cmsc311/Notes/Data/endian.html</a></p>
 </blockquote>
-<p>Visual Studio 和 WinDBG 知道如何访问 Symbol Server 并且如果二进制文件来自官方编译，那么调试器能够自动加载匹配的 PDF 文件。</p>
-<p>在将 PDB 文件放在 Symbol Server 上之前，还需要做一件事：在官方编译出来的 PDB 文件上，通过 Source Server 工具，进行源文件索引（source indexing）。索引过程会嵌入版本控制命令用于拉取当前版本编译的源文件。这样，当你调试当前版本时，你就不用担心找不到版本的源文件。</p>
-<blockquote>
-<p>更多关于 Source Server 的内容，参考 <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/archive/msdn-magazine/2006/august/source-server-helps-you-kill-bugs-dead-in-visual-studio-2005">https://docs.microsoft.com/en-us/archive/msdn-magazine/2006/august/source-server-helps-you-kill-bugs-dead-in-visual-studio-2005</a></p>
-</blockquote>
-<h2 id="什么是-PDB-文件？"><a href="#什么是-PDB-文件？" class="headerlink" title="什么是 PDB 文件？"></a>什么是 PDB 文件？</h2><p>现在，我们可以开始介绍什么是 PDB 文件，以及调试器是如何查找 PDB 文件了。<br>实际的 PDB 文件格式是加密的，但是微软提供了 API，为调试器提供 PDB 文件的数据。</p>
-<p>非托管的 C++ PDB 文件包含了以下信息：</p>
-<ul>
-<li>公有函数，私有函数和静态函数的地址</li>
-<li>全局变量的名称和地址</li>
-<li>参数和局部变量的名称以及栈上的偏移量</li>
-<li>类，结构体以及数据定义的类型信息</li>
-<li>FPO（Frame Pointer Omission） 数据</li>
-<li>源文件的文件名及行信息。</li>
-</ul>
-<p>而 .NET 的 PDB 文件只包含了两项内容：</p>
-<ul>
-<li>源文件的文件名及行信息</li>
-<li>局部变量的名称</li>
-</ul>
-<p>其他所有信息已经存放在 .NET 元数据中，所以没有必要再 PDB 文件中冗余。</p>
-<h2 id="PDB-文件的加载"><a href="#PDB-文件的加载" class="headerlink" title="PDB 文件的加载"></a>PDB 文件的加载</h2><p>当模块被加载到进程的地址空间后，调试器会使用两种信息找到匹配的 PDB 文件。首先，当然是文件名。如果你加载 ZZZ.DLL，那么调试器就会查找 ZZZ.PDB。<br>更重要的是，调试器如何知道这就是匹配的 PDB 文件？这是通过比对内嵌于 PDB 文件和二进制文件中的 GUID 来确认的。</p>
-<p>负责将 GUID 嵌入二进制和 PDB 文件的是编译器（.NET）或者链接器（C++）。想想，历史编译的版本如果没有保存 PDB 文件，你还能调试吗？答案是否定的，哪怕你没有修改源文件！你可能会想是否可以修改 PDB 文件的 GUID？很遗憾，答案也是否定的。</p>
-<p>你可以查看二进制文件中的 GUID。使用 Visual Studio -&gt; DUMPBIN 的命令行工具，你可以列出所有的 PE（Portable Executable） 文件内容。可以在 Visual Studio 的命令行工具中调用 DUMPBIN。</p>
-<blockquote>
-<p>更多关于 DUMPBIN 的内容参考：<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/february/inside-windows-win32-portable-executable-file-format-in-detail">https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/february/inside-windows-win32-portable-executable-file-format-in-detail</a> 和 <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/march/inside-windows-an-in-depth-look-into-the-win32-portable-executable-file-format-part-2">https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/march/inside-windows-an-in-depth-look-into-the-win32-portable-executable-file-format-part-2</a></p>
-</blockquote>
-<p>DUMPBIN 有很多命令行指令，其中显示 GUID 的指令是 /HEADERS。在输出内容中，对我们来说重要的是 Debug Directories 部分的内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Debug Directories</span><br><span class="line"></span><br><span class="line">        Time Type        Size      RVA  Pointer</span><br><span class="line">    -------- ------- -------- -------- --------</span><br><span class="line">    6045C20E cv            60 00541AC8   5408C8    Format: RSDS, &#123;DC80D058-127B-4379-B859-3F9F6978A4DB&#125;, 1, C:ZZZ.pdb</span><br></pre></td></tr></table></figure>
-
-<p>知道了调试器如何确定匹配的 PDB 文件，下一步我们讨论调试器从哪里查找 PDB 文件。首先，调试器会在加载二进制文件的目录查找对应的 PDB 文件，如果没有找到，那么就查找PE 文件中 Debug Directories 内容里硬编码的 PDB 文件路径，在上面的输出示例中是 “C:ZZZ.pdb”（.NET 应用编译工具 MSBUILD会将 PDB 文件编译到 OBJ&lt;Debug/Relase/…&gt; 目录下，如果编译成功，再拷贝到 DEBUG 或者 RELEASE 目录）。如果在上述两个位置都没有找到，但是建立了 Symbol Server，那么调试器会在 Symbol Server 的缓存目录里继续查找。这种查找顺序也保证了本地编译和官方编译不会有冲突。</p>
-<p>在 Visual Studio 中调试的时候，你可以在窗口 Modules 中的列 Symbol File 里看到 PDB 文件的位置。 </p>
-<p>对大多数应用来讲这种加载方式都没有问题。但是对于需要将程序集放入 GAC（Global Assembly Cache）的 .NET 应用，PDB 的加载就会变得有趣了。对于本地编译，调试器会在编译目录找到 PDB 文件，所以没什么问题。问题来源于当你想要在其他机器上调试本地编译版本。</p>
-<p>在其他机器上调式，很多人会用 Gacutil.exe 将程序集放入 GAC，然后打开命令行在 “C:WINDOWSASSEMBLY” 下查找程序集的物理位置。但是基于 Any CPU 编译的程序集实际上会放入类似 “C:WindowsassemblyGAC_MSILExample1.0.0.0__682bc775ff82796a” 的路径。</p>
-<p>上述路径中，Example 是程序集名称，1.0.0.0 是版本号，682bc775ff82796a 是公有秘钥令牌值（public key token value）。当你推断出这个路径后，你可以将 PDB 文件拷入这个目录然后调试器会加载它。</p>
-<h2 id="PDB-文件的内容"><a href="#PDB-文件的内容" class="headerlink" title="PDB 文件的内容"></a>PDB 文件的内容</h2><p>对于官方编译，因为有源文件索引工具，所以 PDB 文件中会存储版本控制命令，用于将源文件放入你配置的源文件缓存池。对于本地编译，PDB 文件中存储的是二进制文件对应的源文件的完整路径。换句话说，如果你使用 C:FOO 中的源文件 MYCODE.CPP，那么 PDB 文件中存储的就是 C:FOOMYCODE.CPP。</p>
-<p>理论上，所有的官方编译会自动立马进行源文件索引，并将内容存储于 Symbol Server，以至于你都不用考虑源文件在哪。然而，有些开发团队在测试及其他环节中会考量编译结果是否满足使用的要求，在此之前，不会对 PDB 文件进行源文件索引。如果你确实需要调试未索引的版本，最好将源代码下载到本地时保证和编译服务器相同的磁盘和目录，否则，你可能会在调试时遇到麻烦。尽管 Visual Studio 调试器和 WinDBG 有配置源文件搜索路径的选项，但要配置正确并不容易。</p>
-<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a target="_blank" rel="noopener" href="https://www.wintellect.com/pdb-files-what-every-developer-must-know/">https://www.wintellect.com/pdb-files-what-every-developer-must-know/</a></p>
+<h2 id="Basic-Memory-Concepts"><a href="#Basic-Memory-Concepts" class="headerlink" title="Basic Memory Concepts"></a>Basic Memory Concepts</h2><p>In order to understand the concept of big and little endian, you need to understand <strong>memory</strong>. Fortunately, we only need a very high level abstraction for memory. You don’t need to know all the little details of how memory works.<br><strong>All you need to know about memory is that it’s one large array</strong>. But one large array containing what? The array contains <strong>bytes</strong>. In computer organization, people don’t use the term “index” to refer to the array locations. Instead, we use the term “address”. “address” and “index” mean the same, so if you’re getting confused, just think of “address” as “index”. </p>
+<p>Each address stores one element of the memory “array”. Each element is typically one byte. There are some memory configurations where each address stores something besides a byte. For example, you might store a nybble or a bit. However, those are exceedingly rare, so for now, we make the broad assumption that all memory addresses store bytes. </p>
+<p>I will sometimes say that memory is <strong>byte-addresseable</strong>. This is just a fancy way of saying that each address stores one byte. If I say memory is nybble-addressable, that means each memory address stores one nybble. </p>
+<h2 id="Storing-Words-in-Memory"><a href="#Storing-Words-in-Memory" class="headerlink" title="Storing Words in Memory"></a>Storing Words in Memory</h2><p>We’ve defined a <strong>word</strong> to mean <strong>32 bits</strong>. This is the same as 4 bytes. Integers, single-precision floating point numbers, and MIPS instructions are all 32 bits long. How can we store these values into memory? After all, each memory address can store a single byte, not 4 bytes.<br>The answer is simple. We split the 32 bit quantity into 4 bytes. For example, suppose we have a 32 bit quantity, written as 90AB12CD16, which is hexadecimal. Since each hex digit is 4 bits, we need 8 hex digits to represent the 32 bit value. </p>
+<p>So, the 4 bytes are: 90, AB, 12, CD where each byte requires 2 hex digits. </p>
+<p>It turns out there are two ways to store this in memory. </p>
+<h2 id="Big-Endian"><a href="#Big-Endian" class="headerlink" title="Big Endian"></a>Big Endian</h2><p>In big endian, you store the <strong>most significant byte</strong> in the smallest address. Here’s how it would look: </p>
+<table>
+<thead>
+<tr>
+<th>Address</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1000</td>
+<td>90</td>
+</tr>
+<tr>
+<td>1001</td>
+<td>AB</td>
+</tr>
+<tr>
+<td>1002</td>
+<td>12</td>
+</tr>
+<tr>
+<td>1003</td>
+<td>CD</td>
+</tr>
+</tbody></table>
+<h2 id="Little-Endian"><a href="#Little-Endian" class="headerlink" title="Little Endian"></a>Little Endian</h2><p>In little endian, you store the <strong>least significant byte</strong> in the smallest address. Here’s how it would look: </p>
+<table>
+<thead>
+<tr>
+<th>Address</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1000</td>
+<td>CD</td>
+</tr>
+<tr>
+<td>1001</td>
+<td>12</td>
+</tr>
+<tr>
+<td>1002</td>
+<td>AB</td>
+</tr>
+<tr>
+<td>1003</td>
+<td>90</td>
+</tr>
+</tbody></table>
+<p>Notice that this is in the reverse order compared to big endian. To remember which is which, recall whether the least significant byte is stored first (thus, little endian) or the most significant byte is stored first (thus, big endian).<br>Notice I used “byte” instead of “bit” in least significant bit. I sometimes abbreciated this as LSB and MSB, with the ‘B’ capitalized to refer to byte and use the lowercase ‘b’ to represent bit. I only refer to most and least significant byte when it comes to endianness. </p>
+<h2 id="Which-Way-Makes-Sense"><a href="#Which-Way-Makes-Sense" class="headerlink" title="Which Way Makes Sense?"></a>Which Way Makes Sense?</h2><p>Different ISAs use different endianness. While one way may seem more natural to you (most people think big-endian is more natural), there is justification for either one.<br>For example, DEC and IBMs(?) are little endian, while Motorolas and Suns are big endian. MIPS processors allowed you to select a configuration where it would be big or little endian. </p>
+<p>Why is endianness so important? Suppose you are storing int values to a file, then you send the file to a machine which uses the opposite endianness and read in the value. You’ll run into problems because of endianness. You’ll read in reversed values that won’t make sense. </p>
+<p>Endianness is also a big issue when sending numbers over the network. Again, if you send a value from a machine of one endianness to a machine of the opposite endianness, you’ll have problems. This is even worse over the network, because you might not be able to determine the endianness of the machine that sent you the data. </p>
+<p>The solution is to send 4 byte quantities using <strong>network byte order</strong> which is arbitrarily picked to be one of the endianness (not sure if it’s big or little, but it’s one of them). If your machine has the same endianness as network byte order, then great, no change is needed. If not, then you must reverse the bytes. </p>
+<h2 id="History-of-Endian-ness"><a href="#History-of-Endian-ness" class="headerlink" title="History of Endian-ness"></a>History of Endian-ness</h2><p>Where does this term “endian” come from? Jonathan Swift was a satirist (he poked fun at society through his writings). His most famous book is “Gulliver’s Travels”, and he talks about how certain people prefer to eat their hard boiled eggs from the little end first (thus, little endian), while others prefer to eat from the big end (thus, big endians) and how this lead to various wars.<br>Of course, the point was to say that it was a silly thing to debate over, and yet, people argue over such trivialities all the time (for example, should braces line in parallel or not? vi or emacs? UNIX or Windows). </p>
+<h2 id="Misconceptions"><a href="#Misconceptions" class="headerlink" title="Misconceptions"></a>Misconceptions</h2><p><strong>Endianness only makes sense when you want to break a large value (such as a word) into several small ones.</strong> You must decide on an order to place it in memory.<br><strong>However, if you have a 32 bit register storing a 32 bit value, it makes no sense to talk about endianness.</strong> The register is neither big endian nor little endian. It’s just a register holding a 32 bit value. The rightmost bit is the least significant bit, and the leftmost bit is the most significant bit. </p>
+<p>There’s no reason to rearrange the bytes in a register in some other way. </p>
+<p><strong>Endianness only makes sense when you are breaking up a multi-byte quantity, and attempting to store the bytes at consecutive memory locations.</strong> In a register, it doesn’t make sense. A register is simply a 32 bit quantity, b31….b0, and endianness does not apply to it. </p>
+<p>With regard to endianness, You may argue there’s a very natural way to store 4 bytes in 4 consecutive addresses, and that the other way looks strange. In particular, it looks “backwards”. However, what’s natural to you may not be natural to someone else. The fact of the matter is that the word is split in 4 bytes, and most people would agree that you need some order to place it in memory. </p>
+<h2 id="C-style-strings"><a href="#C-style-strings" class="headerlink" title="C-style strings"></a>C-style strings</h2><p>Once you start thinking about endianness, you begin to think it applies to everything. Before you see big or little endian, you may have had no idea it even existed. That’s because it’s reasonably well-hidden from you.<br>If you do bitwise/bitshift operations on an int, you don’t notice the endianness. The machine arranges the multiple bytes so the least significant byte is still the least significant byte (e.g., b7-0) and the most significant byte is still the most significant byte (e.g., b31-24). </p>
+<p>So, it’s natural to think whether strings might be saved in some sort of strange order, depending on the machine. </p>
+<p>This is where it’s useful to think about all the facts you know about arrays. A C-style string, after all, is still an array of characters. </p>
+<p>Here are some facts you should know about C-style strings and arrays. </p>
+<p>• C-style strings are stored in arrays of characters.<br>• Each character requires one byte of memory, since characters are represented in ASCII (in the future, this could change, as Unicode becomes more popular).<br>• In an array, the address of consecutive array elements increases. Thus, &amp; arr[ i ] is less than &amp; arr[ i + 1 ].<br>• What’s not as obvious is that if something is stored in increasing addresses in memory, it’s going to be stored in increasing “addresses” in a file. When you write to a file, you usually specify an address in memory, and the number of bytes you wish to write to the file starting at that address.<br>So, let’s imagine some C-style string in memory. You have the word “cat”. Let’s pretend ‘c’ is stored at address 1000. Then ‘a’ is stored at 1001. ‘t’ is at 1002. The null character ‘\0’ is at 1003.<br>Since C-style strings are arrays of characters, they follow the rules of characters. Unlike int or long, you can easily see the individual bytes of a C-style string, one byte at a time. You use array indexing to access the bytes (i.e., characters) of a string. You can’t easily index the bytes of an int or long, without playing some pointer tricks (using reinterpret cast, for example, in C++). The individual bytes of an int are more or less hidden from you. </p>
+<p>Now imagine writing out this string to a file using some sort of write() method. You specify a pointer to ‘c’, and the number of bytes you wish to print (in this case 4). The write() method proceeds byte by byte in the character string and writes it to the file, starting with ‘c’ and working to the null character. </p>
+<p>Given that explanation, is it clear whether endianness matters with C-style strings? Hopefully, it is clear. </p>
+<p>As an aside, since C++ strings are objects, it may have complicated inner structures, and so it’s less obvious what a C++ string would look like when print out to a file. It’s well-known what a C-style string looks like (a sequence of characters ending in a null character), which is why I’ve been careful to call them C-style strings. </p>
 
     </div>
 
@@ -415,42 +436,24 @@
     
     
       
-  <div class="popular-posts-header">Related Posts</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2021\04\12\cplusplus\exception-handling\" rel="bookmark">Modern C++ 中错误处理的最佳实践</a></div>
-    </li>
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2021\03\17\cplusplus\compile-error-c4819\" rel="bookmark">关于编译告警 C4819 的完整解决方案</a></div>
-    </li>
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2021\03\12\cplusplus\push-back-vs-emplace-back\" rel="bookmark">你想知道的 std::vector::push_back 和 std::vector::emplace_back</a></div>
-    </li>
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2021\03\11\cplusplus\how-to-use-dump-file\" rel="bookmark">如何使用 Dump 文件？</a></div>
-    </li>
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\2021\03\09\cplusplus\hash-map\" rel="bookmark">图解哈希表及其原理</a></div>
-    </li>
-  </ul>
 
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Basic-C/" rel="tag"><i class="fa fa-tag"></i> Basic C++</a>
+              <a href="/tags/Computer-Theroy/" rel="tag"><i class="fa fa-tag"></i> Computer Theroy</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2021/03/09/computer_theory/big_little_endian/" rel="prev" title="Big and Little Endian">
-                  <i class="fa fa-chevron-left"></i> Big and Little Endian
+                <a href="/2021/03/09/cplusplus/hash-map/" rel="prev" title="图解哈希表及其原理">
+                  <i class="fa fa-chevron-left"></i> 图解哈希表及其原理
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2021/03/11/cplusplus/how-to-use-dump-file/" rel="next" title="如何使用 Dump 文件？">
-                  如何使用 Dump 文件？ <i class="fa fa-chevron-right"></i>
+                <a href="/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/" rel="next" title="关于 PDB 文件你需要知道什么？">
+                  关于 PDB 文件你需要知道什么？ <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
@@ -588,7 +591,7 @@ NexT.utils.loadComments('#valine-comments', () => {
   NexT.utils.getScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
     new Valine(Object.assign({"enable":true,"appId":"jB6A35tvF0LjzWwNsVUfuQXo-MdYXbMMI","appKey":"K2TAb2RfLKzVREj9hrx1qzFo","serverURLs":null,"placeholder":"欢迎留言指正与交流...","avatar":"robohash","meta":["nick","mail","link"],"pageSize":10,"lang":null,"visitor":false,"comment_count":true,"recordIP":false,"enableQQ":false,"requiredFields":[]}, {
       el: '#valine-comments',
-      path: "/2021/03/10/cplusplus/what-you-should-known-4-pdb-file/",
+      path: "/2021/03/09/computer_theory/big_little_endian/",
       serverURLs: "https://jb6a35tv.api.lncldglobal.com"
     }));
   }, window.Valine);

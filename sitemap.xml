@@ -2,14 +2,35 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://stevenhuhpy.com/tags/index.html</loc>
+    <loc>https://stevenhuhpy.com/2021/05/18/philosophy/not_late_not_early/</loc>
+    
+    <lastmod>2021-05-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://stevenhuhpy.com/2020/07/02/donet/dependency_injection/</loc>
+    
+    <lastmod>2021-05-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://stevenhuhpy.com/2021/03/09/computer_theory/big_little_endian/</loc>
+    
+    <lastmod>2021-04-19</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://stevenhuhpy.com/sitemap/index.html</loc>
     
     <lastmod>2021-04-12</lastmod>
     
   </url>
   
   <url>
-    <loc>https://stevenhuhpy.com/sitemap/index.html</loc>
+    <loc>https://stevenhuhpy.com/tags/index.html</loc>
     
     <lastmod>2021-04-12</lastmod>
     
@@ -38,13 +59,6 @@
   
   <url>
     <loc>https://stevenhuhpy.com/1901/04/06/hexo/Hi-Steven/</loc>
-    
-    <lastmod>2021-04-12</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://stevenhuhpy.com/2020/07/02/donet/dependency_injection/</loc>
     
     <lastmod>2021-04-12</lastmod>
     
@@ -165,43 +179,57 @@
 
   <url>
     <loc>https://stevenhuhpy.com/</loc>
-    <lastmod>2021-04-13</lastmod>
+    <lastmod>2021-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   
   <url>
+    <loc>https://stevenhuhpy.com/tags/Computer-Theroy/</loc>
+    <lastmod>2021-05-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://stevenhuhpy.com/tags/Basic-C/</loc>
-    <lastmod>2021-04-13</lastmod>
+    <lastmod>2021-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://stevenhuhpy.com/tags/Debug/</loc>
-    <lastmod>2021-04-13</lastmod>
+    <lastmod>2021-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://stevenhuhpy.com/tags/hexo/</loc>
-    <lastmod>2021-04-13</lastmod>
+    <lastmod>2021-05-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://stevenhuhpy.com/tags/Philosophy/</loc>
+    <lastmod>2021-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://stevenhuhpy.com/tags/NET/</loc>
-    <lastmod>2021-04-13</lastmod>
+    <lastmod>2021-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://stevenhuhpy.com/tags/Design-Patterns/</loc>
-    <lastmod>2021-04-13</lastmod>
+    <lastmod>2021-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -209,22 +237,36 @@
 
   
   <url>
+    <loc>https://stevenhuhpy.com/categories/computer-theroy/</loc>
+    <lastmod>2021-05-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://stevenhuhpy.com/categories/c/</loc>
-    <lastmod>2021-04-13</lastmod>
+    <lastmod>2021-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://stevenhuhpy.com/categories/hexo/</loc>
-    <lastmod>2021-04-13</lastmod>
+    <lastmod>2021-05-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://stevenhuhpy.com/categories/philosophy/</loc>
+    <lastmod>2021-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://stevenhuhpy.com/categories/donet/</loc>
-    <lastmod>2021-04-13</lastmod>
+    <lastmod>2021-05-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
